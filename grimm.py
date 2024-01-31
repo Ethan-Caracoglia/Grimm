@@ -1,4 +1,3 @@
-# Example file showing a basic pygame "game loop"
 import pygame
 
 # Constant values for trackin the screen dimensions.
@@ -13,25 +12,19 @@ running = True
 
 # Variable for detla-time.
 dt = 1
-player_pos = 0
-player_size = 0
+player_pos = pygame.Vector2(0,0)
+player_size = 5
     
 def game_setup():
     player_pos = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) 
     player_size = 10
         
 
-    # Function to run inside of the game loop
+# Function to run inside of the game loop
 def game_loop(Number: dt):
-    # Print the framerate
+    # Print the framerate as an integer
     if dt != 0:
-        print(1 / dt)
-
-    if player_pos.y < (SCREEN_HEIGHT - player_size / 2):
-        player_pos = -player_size 
-
-    # Drawing
-    pygame.draw.circle(screen, "green", player_size)
+        print(int(1 / dt))
     
 # set up the game
 game_setup()
