@@ -11,13 +11,17 @@ dt = 0
 # player movement vectors
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_vel = pygame.Vector2(0, 0)
+player_dir = pygame.Vector2(0, 0)
 player_accel = pygame.Vector2(0, 0)
+player_force = pygame.Vector2(0, 0)
 
 # player movement scalars
-player_max_speed = 100
-player_max_accel = 50
-player_frict_coeff = 0.3
-player_mass = 10
+player_max_speed = 10
+player_max_force = 1000
+player_frict_coeff = 0.9
+player_mass = 5
+player_stopping_speed = 0.1
+player_radius = 50
 
 while running:
     # poll for events
@@ -27,64 +31,60 @@ while running:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+    screen.fill("cornflowerblue")
 
     # render the player
-    pygame.draw.circle(screen, "red", player_pos, 40)
+    pygame.draw.circle(screen, "red", player_pos, player_radius)
 
-    # reset the acceleration for each run of the loop
-    player_accel = pygame.Vector2(0,0)
+    # reset the FORCE for each run of the loop
+    player_force = pygame.Vector2(0,0)
 
-    # accelerates the player in a direction based on what keys are preses
+    # points the FORCE in a direction based on the buttons pressed
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
-        player_accel.y -= 1
+        player_force.y += -1
     if keys[pygame.K_s]:
-        player_accel.y += 1
+        player_force.y += 1
     if keys[pygame.K_a]:
-        player_accel.x -= 1
+        player_force.x += -1
     if keys[pygame.K_d]:
-        player_accel.x += 1
+        player_force.x += 1
 
-    # normalize the acceleration if it is not zero
-    if (player_accel.magnitude() != 0):
-        player_accel.normalize()
-        
-    # if the player acceleration is zero and the player is moving then slow down
-    elif (player_vel.magnitude() != 0):
-        # makes the player's acceleration equal to the direction multiplied by the max acceleration
-        # multiplied by the friction coefficient
-        player_accel = -player_vel.normalize() * player_max_accel * player_frict_coeff
-        
-    # reverse direction if the player hits a wall
-    # if (player_pos.x > screen.get_width() - 50):
-    #    player_accel.x = -player_max_accel
-    # if (player_pos.x < 50):
-    #    player_accel.x = player_max_accel
-    # if (player_pos.y > screen.get_height() - 50):
-    #     player_accel.y = -player_max_accel
-    # if (player_pos.y < 50):
-    #     player_accel.y = player_max_accel
+    # normalize the FORCE if it is not zero and prepare it for computation
+    if player_force.magnitude() != 0:
+        player_force = player_force.normalize()
     
-    # if the player is adding acceleration then the velocity will increase and if they are not then
-    # it will decrease
-    player_vel += player_accel * player_max_accel / player_mass
-        # when the player has slowed down enough, stop them
+    # if the player is not pressing anything, then slow the player if they are moving
+    elif (player_force.magnitude() == 0) and (player_vel.magnitude() > player_stopping_speed):
+        player_force = -player_vel * player_frict_coeff
     
-    # Lock player at or below max speed
-    if (player_vel.magnitude() > player_max_speed):
+    # if the player is not pressing anything and is moving slower than the STOPPING SPEED then stop
+    elif (player_vel.magnitude() <= player_stopping_speed):
+        player_vel = pygame.Vector2(0, 0)
+        
+    # calculate the player ACCELERATION by dividing FORCE by MASS and multiplying by the DELTA TIME
+    player_accel = ((player_force * player_max_force) / player_mass) * dt
+    
+    # add the ACCELERATION to the VELOCITY
+    player_vel = player_vel + player_accel
+    
+    # clamp the magnitude of the velocity
+    if player_vel.magnitude() >= player_max_speed:
         player_vel = player_vel.normalize() * player_max_speed
     
-    # move the player by the velocity
-    player_pos += player_vel * dt
+    # add the velocity to position
+    player_pos = player_pos + player_vel
     
-    if (dt * 1000 % 10 > 0):
-        print("player_pos:", player_pos)
-        print("player_vel:", player_vel)
-        print("player_vel.magnitude():", player_vel.magnitude())
-        print("player_accel:", player_accel)
-        print("player_accel.magnitude():", player_accel.magnitude())
-
+    # reverse direction if the player hits a wall
+    if player_pos.x > screen.get_width() + player_radius:
+        player_pos.x = -player_radius
+    if player_pos.x < -player_radius:
+        player_pos.x = screen.get_width() + player_radius
+    if player_pos.y > screen.get_height() + player_radius:
+        player_pos.y = -player_radius
+    if player_pos.y < -player_radius:
+        player_pos.y = screen.get_height() + player_radius
+    
     # flip() the display to put your work on screen
     pygame.display.flip()
 
