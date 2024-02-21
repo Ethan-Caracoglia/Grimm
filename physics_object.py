@@ -1,10 +1,10 @@
 import pygame
 
-class Physics_Object:
+class PhysicsObject:
     
     #p_pos, p_vel, p_accel, p_dir, p_force, p_mass, p_max_speed, p_max_force, p_frict_coeff, p_is_grav, p_is_frict
     
-    def __init__(self, pos: pygame.Vector2, mass: float, max_speed: float, max_force: float, frict_coeff: float, is_grav: bool, is_frict: bool):
+    def __init__(self, pos: pygame.Vector2 = pygame.Vector2(0, 0), mass: float = 10, max_speed: float = 10, max_force: float = 10, frict_coeff: float = 0.5, is_grav: bool = True, is_frict: bool = True):
         self.p_pos = pygame.Vector2(pos.x, pos.y)
         self.p_vel = pygame.Vector2(0, 0)
         self.p_accel = pygame.Vector2(0, 0)
