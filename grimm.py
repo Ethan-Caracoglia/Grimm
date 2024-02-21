@@ -1,5 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame
+import physics_object
 
 # pygame setup
 pygame.init()
@@ -55,12 +56,12 @@ while running:
         player_force = player_force.normalize()
     
     # if the player is not pressing anything, then slow the player if they are moving
-    elif (player_force.magnitude() == 0) and (player_vel.magnitude() > player_stopping_speed):
-        player_force = -player_vel * player_frict_coeff
+    #elif (player_force.magnitude() == 0) and (player_vel.magnitude() > player_stopping_speed):
+    #    player_force += -player_force * (player_mass * -9.8) * player_frict_coeff
     
     # if the player is not pressing anything and is moving slower than the STOPPING SPEED then stop
-    elif (player_vel.magnitude() <= player_stopping_speed):
-        player_vel = pygame.Vector2(0, 0)
+    #elif (player_vel.magnitude() < 0):
+    #    player_vel = pygame.Vector2(0, 0)
         
     # calculate the player ACCELERATION by dividing FORCE by MASS and multiplying by the DELTA TIME
     player_accel = ((player_force * player_max_force) / player_mass) * dt
