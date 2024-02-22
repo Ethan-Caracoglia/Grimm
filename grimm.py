@@ -1,6 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame
-import physics_object
+from physics_object import PhysicsObject
 
 # pygame setup
 pygame.init()
